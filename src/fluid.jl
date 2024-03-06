@@ -81,6 +81,7 @@ end
 
 Compute the equilibrium density of the fluid from the total density and the momentum.
 """
+# function equilibrium_density(lb::AbstractLBConfig{<:Any, N}, ρ, u) where {N}
 function equilibrium_density(lb::AbstractLBConfig{D, N}, ρ, u) where {D, N}
     ws, ds = weights(lb), directions(lb)
     return Cell(
@@ -102,4 +103,68 @@ function collide(lb::AbstractLBConfig{D, N}, rho; viscosity = 0.02) where {D, N}
     v = momentum(lb, rho)
     return (1 - omega) * rho + omega * equilibrium_density(lb, density(rho), v)
 end
+
+"""
+    LatticeBoltzmann{D, N, T, CFG, MT, BT}
+
+A lattice Boltzmann simulation with D dimensions, N velocities, and lattice configuration CFG.
+"""
+
+struct LatticeBoltzmann{D, N, T, CFG<:AbstractLBConfig{D, N}, MT<:AbstractMatrix{Cell{N, T}}, BT<:AbstractMatrix{Bool}}
+    config::CFG # lattice configuration
+    grid::MT    # density of the fluid
+    gridcache::MT # cache for the density of the fluid
+    barrier::BT # barrier configuration
+end
+
+function LatticeBoltzmann(config::AbstractLBConfig{D, N}, grid::AbstractMatrix{<:Cell}, barrier::AbstractMatrix{Bool}) where {D, N}
+    @assert size(grid) == size(barrier)
+    return LatticeBoltzmann(config, grid, similar(grid), barrier)
+end
+
+"""
+    step!(lb::LatticeBoltzmann)
+
+Perform a single step of the lattice Boltzmann simulation.
+"""
+function step!(lb::LatticeBoltzmann)
+    copyto!(lb.gridcache, lb.grid)
+    stream!(lb.config, lb.grid, lb.gridcache, lb.barrier)
+    lb.grid .= collide.(Ref(lb.config), lb.grid)
+    return lb
+end
+
+"""
+    curl(u::AbstractMatrix{Point2D{T}})
+
+Compute the curl of the momentum field in 2D, which is defined as:
+```math
+∂u_y/∂x−∂u_x/∂y
+```
+"""
+function curl(u::Matrix{Point2D{T}}) where T 
+    return map(CartesianIndices(u)) do ci
+        i, j = ci.I
+        m, n = size(u)
+        uy = u[mod1(i + 1, m), j][2] - u[mod1(i - 1, m), j][2]
+        ux = u[i, mod1(j + 1, n)][1] - u[i, mod1(j - 1, n)][1]
+        return uy - ux # a factor of 1/2 is missing here?
+    end
+end
+
+function example_d2q9(;
+    height = 80, width = 200,
+    u0 = Point(0.0, 0.1)) # initial and in-flow speed
+# Initialize all the arrays to steady rightward flow:
+rho = equilibrium_density(D2Q9(), 1.0, u0)
+rgrid = fill(rho, height, width)
+
+# Initialize barriers:
+barrier = falses(height, width)  # True wherever there's a barrier
+mid = div(height, 2)
+barrier[mid-8:mid+8, div(height,2)] .= true              # simple linear barrier
+
+return LatticeBoltzmann(D2Q9(), rgrid, barrier)
+end
+
 
