@@ -1,14 +1,19 @@
 name = "MyFirstPackage"
-uuid = "daecc9bd-0266-4a93-b081-4958a1c185c0"
-authors = ["nzy1997"]
+uuid = "fca0d0d9-6fd8-495b-b6e5-3c7183d6e349"
+authors = ["QingyunQian"]
 version = "1.0.0-DEV"
 
 [deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
+IterTools = "c8e1da08-722c-5040-9ed9-7db0dc04731e"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 
 [compat]
-julia = "1.10"
 LinearAlgebra = "1"
+julia = "1.10"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

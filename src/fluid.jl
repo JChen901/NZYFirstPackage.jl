@@ -2,9 +2,8 @@
     AbstractLBConfig{D, N}
 
 An abstract type for lattice Boltzmann configurations.
-
-- `D`: the dimension of the lattice
-- `N`: the number of velocities
+    D is the dimension of the lattice.
+    N is the number of velocities.
 """
 abstract type AbstractLBConfig{D, N} end
 
@@ -14,7 +13,6 @@ abstract type AbstractLBConfig{D, N} end
 A lattice Boltzmann configuration for 2D, 9-velocity model.
 """
 struct D2Q9 <: AbstractLBConfig{2, 9} end
-
 directions(::D2Q9) = (
         Point(1, 1), Point(-1, 1),
         Point(1, 0), Point(0, -1),
@@ -23,8 +21,7 @@ directions(::D2Q9) = (
         Point(-1, -1),
     )
 
-
-# directions[k] is the opposite of directions[flip_direction_index(k)
+    # directions[k] is the opposite of directions[flip_direction_index(k)
 function flip_direction_index(::D2Q9, i::Int)
     return 10 - i
 end
@@ -81,7 +78,6 @@ end
 
 Compute the equilibrium density of the fluid from the total density and the momentum.
 """
-# function equilibrium_density(lb::AbstractLBConfig{<:Any, N}, ρ, u) where {N}
 function equilibrium_density(lb::AbstractLBConfig{D, N}, ρ, u) where {D, N}
     ws, ds = weights(lb), directions(lb)
     return Cell(
@@ -104,20 +100,21 @@ function collide(lb::AbstractLBConfig{D, N}, rho; viscosity = 0.02) where {D, N}
     return (1 - omega) * rho + omega * equilibrium_density(lb, density(rho), v)
 end
 
+
 """
     LatticeBoltzmann{D, N, T, CFG, MT, BT}
 
 A lattice Boltzmann simulation with D dimensions, N velocities, and lattice configuration CFG.
 """
 
-struct LatticeBoltzmann{D, N, T, CFG<:AbstractLBConfig{D, N}, MT<:AbstractMatrix{Cell{N, T}}, BT<:AbstractMatrix{Bool}}
+struct LatticeBoltzmann{D, N, T, CFG<:AbstractLBConfig{D, N}, MT<:AbstractArray{Cell{N, T},D}, BT<:AbstractArray{Bool,D}}
     config::CFG # lattice configuration
     grid::MT    # density of the fluid
     gridcache::MT # cache for the density of the fluid
     barrier::BT # barrier configuration
 end
 
-function LatticeBoltzmann(config::AbstractLBConfig{D, N}, grid::AbstractMatrix{<:Cell}, barrier::AbstractMatrix{Bool}) where {D, N}
+function LatticeBoltzmann(config::AbstractLBConfig{D, N}, grid::AbstractArray{<:Cell,D}, barrier::AbstractArray{Bool,D}) where {D, N}
     @assert size(grid) == size(barrier)
     return LatticeBoltzmann(config, grid, similar(grid), barrier)
 end
@@ -152,6 +149,7 @@ function curl(u::Matrix{Point2D{T}}) where T
     end
 end
 
+
 function example_d2q9(;
     height = 80, width = 200,
     u0 = Point(0.0, 0.1)) # initial and in-flow speed
@@ -166,5 +164,7 @@ barrier[mid-8:mid+8, div(height,2)] .= true              # simple linear barrier
 
 return LatticeBoltzmann(D2Q9(), rgrid, barrier)
 end
+
+
 
 

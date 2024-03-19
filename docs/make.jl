@@ -5,10 +5,10 @@ DocMeta.setdocmeta!(MyFirstPackage, :DocTestSetup, :(using MyFirstPackage); recu
 
 makedocs(;
     modules=[MyFirstPackage],
-    authors="nzy1997",
+    authors="QingyunQian",
     sitename="MyFirstPackage.jl",
     format=Documenter.HTML(;
-        canonical="https://nzy1997.github.io/MyFirstPackage.jl",
+        canonical="https://QingyunQian.github.io/MyFirstPackage.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -18,6 +18,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/nzy1997/MyFirstPackage.jl",
+    repo="github.com/QingyunQian/MyFirstPackage.jl",
     devbranch="main",
 )

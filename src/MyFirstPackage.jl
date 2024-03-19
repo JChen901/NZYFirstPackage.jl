@@ -10,5 +10,7 @@ export D2Q9, LatticeBoltzmann, step!, equilibrium_density, momentum, curl, examp
 
 include("lorenz.jl")
 include("fluid.jl")
+export D3Q19, example_d3q19
+include("fluid3.jl")
 
 end

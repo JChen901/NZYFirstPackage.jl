@@ -4,7 +4,7 @@ CurrentModule = MyFirstPackage
 
 # MyFirstPackage
 
-Documentation for [MyFirstPackage](https://github.com/nzy1997/MyFirstPackage.jl).
+Documentation for [MyFirstPackage](https://github.com/QingyunQian/MyFirstPackage.jl).
 
 ```@index
 ```
